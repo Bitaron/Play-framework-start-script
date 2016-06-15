@@ -1,0 +1,49 @@
+
+
+#This a start script for play framework. It usagese
+#activator stage command to run play.
+#First it kills the existing application if any exists.
+#Then copy the log file.
+#And run play. It also moves the pid file and uses https
+
+#! /bin/bash
+
+PLAY_PROCESS="java"
+APP_DIR="home/ubuntu/Questtag\ Delivery/"
+
+
+#Killing current play process
+echo "[info]"
+echo "[info] ----Killing play current process"
+echo "[info]"
+sudo pkill $PLAY_PROCESS
+sudo rm " /var/run/play.pid" 2> /dev/null
+
+
+#Move to project directory
+echo "[info]"
+echo "[info] ----Moving to project directory"
+echo "[info]"
+eval cd $APP_DIR
+
+echo "[info]"
+echo "[info] ----Copying log file"
+echo "[info]"
+NOW=$(date +"%N")
+cd logs
+mkdir "$NOW"
+cd ..
+cp target/universal/stage/logs/application.log  logs/"$NOW"
+
+
+
+echo "[info]"
+echo "[info] ----starting the application"
+echo "[info]"
+sudo ./activator "clean" 
+sudo ./activator "stage" 
+sudo nohup target/universal/stage/bin/<project-name> -Dpidfile.path=/var/run/play.pid -Dhttps.port=443 -Dhttp.port=80 -Dhttps.keyStore=<project-key-store> -Dhttps.keyStoreType=<key-type> -Dhttps.keyStorePassword=<key-store-password>  >> nohup.out 2>&1  &
+exit 0
+
+
+
